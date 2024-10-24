@@ -17,8 +17,8 @@ import (
  * It uses OPA's Go library to evaluate queries...
  * Extract the new state and the real output of the evaluated query
  *
- * data - the data that OPA need to evalute the query
- * input - input provided by the user needed to eveluate the query
+ * data - the data that OPA need to evaluate the query
+ * input - input provided by the user needed to evaluate the query
  * w - to handle http errors
  * ctx - context of the http request
  */
