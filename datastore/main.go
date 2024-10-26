@@ -21,34 +21,34 @@ type ds struct {
 func main() {
 	log.Println("[INFO] Starting datastore at port", PORT)
 
-	var data ds
-	data.store = make(map[string]any)
-	loadFromFile(&data.store)
+	var datastore ds
+	datastore.store = make(map[string]any)
+	loadFromFile(&datastore.store)
 
-	if len(data.store) != 0 {
+	if len(datastore.store) != 0 {
 		log.Println("[INFO] Load content from", filename, "filename")
 	}
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /data", handleData(data.store))
-	mux.HandleFunc("PUT /data/{key}", handleUpdate(data.store))
-	mux.HandleFunc("GET /lock", handleLock(&data))
-	mux.HandleFunc("GET /unlock", handleUnlock(&data))
+	mux.HandleFunc("GET /data", handleData(datastore.store))
+	mux.HandleFunc("PUT /data/{key}", handleUpdate(datastore.store))
+	mux.HandleFunc("GET /lock", handleLock(&datastore))
+	mux.HandleFunc("GET /unlock", handleUnlock(&datastore))
 
 	log.Fatal(http.ListenAndServe(":8081", mux))
 }
 
-func handleLock(data *ds) http.HandlerFunc {
+func handleLock(datastore *ds) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data.lock.Lock()
+		datastore.lock.Lock()
 		log.Printf("Locked...")
 	}
 }
 
-func handleUnlock(data *ds) http.HandlerFunc {
+func handleUnlock(datastore *ds) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data.lock.Unlock()
+		datastore.lock.Unlock()
 		log.Printf("Unlocked...")
 	}
 }
