@@ -27,8 +27,10 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 	baseURL := &url.URL{
 		Scheme: "http",
 		Host:   "localhost:8081",
-		Path:   "data",
 	}
+
+	// lock datastore
+	lock(baseURL, w)
 
 	// retrieve input to send to the policy engine
 	body, err := io.ReadAll(r.Body)
@@ -50,6 +52,9 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 
 	updateState(baseURL, state, w)
 
+	// unlock datastore
+	unlock(baseURL, w)
+
 	// Return only necessary output (i.e. without state part) to user
 	output, err := json.Marshal(result)
 	if err != nil {
@@ -68,6 +73,7 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
  * w - to handle http errors
  */
 func getState(baseURL *url.URL, state *map[string]any, w http.ResponseWriter) {
+	baseURL.Path = "data"
 	client := http.Client{}
 	resp, err := client.Get(baseURL.String())
 	if err != nil {
@@ -116,5 +122,25 @@ func updateState(baseURL *url.URL, state map[string]any, w http.ResponseWriter) 
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+	}
+}
+
+func lock(baseURL *url.URL, w http.ResponseWriter) {
+	baseURL.Path = "lock"
+	client := http.Client{}
+	_, err := client.Get(baseURL.String())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func unlock(baseURL *url.URL, w http.ResponseWriter) {
+	baseURL.Path = "unlock"
+	client := http.Client{}
+	_, err := client.Get(baseURL.String())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }

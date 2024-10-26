@@ -6,23 +6,46 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 )
 
 var filename = "data.json"
 
+type ds struct {
+	lock  sync.Mutex
+	store map[string]any
+}
+
 func main() {
-	store := make(map[string]any)
-	err := loadFromFile(&store)
+	var data ds
+	data.store = make(map[string]any)
+	err := loadFromFile(&data.store)
 	if err != nil {
-		log.Fatal()
+		log.Printf("Unable to load %s...", filename)
 	}
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /data", handleData(store))
-	mux.HandleFunc("PUT /data/{key}", handleUpdate(store))
+	mux.HandleFunc("GET /data", handleData(data.store))
+	mux.HandleFunc("PUT /data/{key}", handleUpdate(data.store))
+	mux.HandleFunc("GET /lock", handleLock(&data))
+	mux.HandleFunc("GET /unlock", handleUnlock(&data))
 
 	log.Fatal(http.ListenAndServe(":8081", mux))
+}
+
+func handleLock(data *ds) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data.lock.Lock()
+		log.Printf("Locked...")
+	}
+}
+
+func handleUnlock(data *ds) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data.lock.Unlock()
+		log.Printf("Unlocked...")
+	}
 }
 
 func loadFromFile(store *map[string]any) error {
