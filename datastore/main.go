@@ -11,17 +11,22 @@ import (
 
 var filename = "data.json"
 
+const PORT = "8081"
+
 type ds struct {
 	lock  sync.Mutex
 	store map[string]any
 }
 
 func main() {
+	log.Println("[INFO] Starting datastore at port", PORT)
+
 	var data ds
 	data.store = make(map[string]any)
-	err := loadFromFile(&data.store)
-	if err != nil {
-		log.Printf("Unable to load %s...", filename)
+	loadFromFile(&data.store)
+
+	if len(data.store) != 0 {
+		log.Println("[INFO] Load content from", filename, "filename")
 	}
 
 	mux := http.NewServeMux()
@@ -48,19 +53,12 @@ func handleUnlock(data *ds) http.HandlerFunc {
 	}
 }
 
-func loadFromFile(store *map[string]any) error {
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
+func loadFromFile(store *map[string]any) {
+	data, err := os.ReadFile(filename)
+	// if ReadFile is successufl, the error is nil
+	if err == nil {
+		json.Unmarshal(data, &store)
 	}
-	defer file.Close()
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(data, &store)
 }
 
 func handleData(store map[string]any) http.HandlerFunc {
