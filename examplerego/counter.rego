@@ -7,6 +7,6 @@ state["counter"] := data.counter - 1 if allow
 default allow := false
 
 allow if {
-	data.counter > 0
 	input.source == "x"
+	data.counter > 0
 }
