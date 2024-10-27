@@ -7,6 +7,6 @@ state["counter"] := data.counter - 1 if allow
 default allow := false
 
 allow if {
-	input.source == "x"
+	input.user == "fabio"
 	data.counter > 0
 }

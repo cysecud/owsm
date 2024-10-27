@@ -14,10 +14,10 @@ allow if {
 allow if {
 	input.source == "b"
 	input.dest == "c"
-	data.ab == false
+	data.a_to_b == false
 }
 
-state["ab"] if {
+state["a_to_b"] if {
 	input.source == "a"
 	input.dest == "b"
 }
