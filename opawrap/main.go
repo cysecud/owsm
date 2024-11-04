@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 
 	"opawrap/queryeval"
@@ -24,9 +25,16 @@ func main() {
 
 func handleQuery(w http.ResponseWriter, r *http.Request) {
 
+	// Searching for env variable DATASTORE_URL
+	// otherwise using localhost
+	datastoreUrl, ok := os.LookupEnv("DATASTORE_URL")
+	if !ok {
+		datastoreUrl = "localhost"
+	}
+
 	baseURL := &url.URL{
 		Scheme: "http",
-		Host:   "localhost:8081",
+		Host:   datastoreUrl + ":8081",
 	}
 
 	// lock datastore
