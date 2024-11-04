@@ -20,5 +20,3 @@ COPY --from=build /datastore /datastore
 EXPOSE 8081
 
 USER nonroot:nonroot
-
-ENTRYPOINT ["/datastore"]
