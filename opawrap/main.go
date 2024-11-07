@@ -56,7 +56,7 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 	var data map[string]any
 	getState(baseURL, &data, w)
 
-	state, result := queryeval.OPA(data, input, w, r.Context())
+	state, result := queryeval.Opa(data, input, w, r.Context())
 
 	updateState(baseURL, state, w)
 

@@ -22,7 +22,7 @@ import (
  * w - to handle http errors
  * ctx - context of the http request
  */
-func OPA(data map[string]any, input any,
+func Opa(data map[string]any, input any,
 	w http.ResponseWriter, ctx context.Context) (map[string]any, map[string]any) {
 
 	packageRego := "data.examplerego"
