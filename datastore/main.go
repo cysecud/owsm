@@ -48,6 +48,10 @@ func handleLock(datastore *ds) http.HandlerFunc {
 
 func handleUnlock(datastore *ds) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		err := saveToFile(datastore.store)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		datastore.lock.Unlock()
 		log.Printf("Unlocked...")
 	}
@@ -89,11 +93,6 @@ func handleUpdate(store map[string]any) http.HandlerFunc {
 		}
 		store[key] = data
 		log.Printf("Set %q to %v", key, data)
-
-		err = saveToFile(store)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-		}
 
 		w.WriteHeader(http.StatusOK)
 	}
