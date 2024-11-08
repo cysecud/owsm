@@ -9,7 +9,7 @@ services:
     build: ./opawrap
     entrypoint:
       - /opawrap
-      - /policies/counter.rego
+      - /policies/${POLICY_FILE}
     ports:
       - "8080:8080"
     volumes:
