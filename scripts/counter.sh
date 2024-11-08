@@ -5,7 +5,7 @@ DATASTORE_PORT="8081"
 WRAPPER_URL="localhost"
 WRAPPER_PORT="8080"
 
-curl -X PUT --header 'Content-Type: application/json' --data-raw '5' http://"${DATASTORE_URL}":"${DATASTORE_PORT}"/data/counter
+curl -X PUT --header 'Content-Type: application/json' --data-raw '5' "http://${DATASTORE_URL}:${DATASTORE_PORT}/data/counter"
 curl -X GET "http://${DATASTORE_URL}:${DATASTORE_PORT}/data"
 echo "\r"
 
