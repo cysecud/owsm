@@ -25,13 +25,15 @@ cd opawrap
 go run main.go ../policies/rule-File.rego
 ```
 
-where *rule-File.rego* is either *comm.rego* or *counter.rego* in the *examplerego* dir
+where *rule-File.rego* is either *comm.rego* or *counter.rego* in the *policies* dir
 
 use a tool like Yaak (or simply CURL) to make request to the endpoint provided by datastore and opawrap
 
+#### Counter example
+
 Let's see how to use the **OPA-Wrapper State Manager** with the counter example...
 
-First, make a PUT request to the ***/data/counter*** API of datastore in order to save the initial value of the counter (this will be used as the initial data.json)
+1 - Make a PUT request to the ***/data/counter*** API of datastore in order to save the initial value of the counter (this will be used as the initial data.json)
 
 ```bash
 curl -X PUT 'http://localhost:8081/data/counter' \
@@ -47,13 +49,13 @@ In alternative, you can create a data.json in the *datastore* dir and fill it ou
 }
 ```
 
-Then we check that the request was successful
+2 - We check that the request was successful
 
 ```bash
 curl -X GET 'http://localhost:8081/data'
 ```
 
-Next, we will use the ***/query*** endpoint of opawrap to make a query.
+3 - Next, we will use the ***/query*** endpoint of opawrap to make a query.
 In this example the input has to be a JSON with a user.
 The counter.rego policy allowes the access only if the user is ***fabio***
 
@@ -74,7 +76,8 @@ If we repeat the last command various time, at some point we will encounter
 ```
 
 that's because the counter was decremented to 0
-
+ 
+#### Three Microservices example
 
 In order to use the comm.rego example the steps are the same, with the appropiate changes:
 
