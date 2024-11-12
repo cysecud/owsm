@@ -108,7 +108,7 @@ In this example ***b*** can communicate with ***c*** until ***a*** start to comm
 
 4 - If we make this query
 
-```json
+```bash
 curl -X POST 'http://localhost:8080/query' \
   --header 'Content-Type: application/json' \
   --data-raw $'{
