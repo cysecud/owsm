@@ -7,8 +7,8 @@ More precisely it saves the ***state*** composite value of Rego, in the **datast
 
 ### There are two main ways to try the wrapper:
 
-1) Using ``` go run ``` and then ```curl``` commands
-2) Using the ```compose file``` and running the scripts
+1) [Using ``` go run ``` and then ```curl``` commands](#first-method)
+2) [Using the ```compose file``` and running the scripts](#second-method)
 
 ### First Method
 1 - Run the **datastore**:
