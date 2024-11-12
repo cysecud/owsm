@@ -13,9 +13,11 @@ import (
 	"opawrap/queryeval"
 )
 
-// TODO: sistemare gli err
+const PORT = "8080"
 
 func main() {
+	log.Println("[INFO] Starting opawrap at port", PORT)
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /query", handleQuery)
@@ -53,12 +55,18 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("[INFO] Received input")
+
 	var data map[string]any
 	getState(baseURL, &data, w)
 
 	state, result := queryeval.Opa(data, input, w, r.Context())
 
+	log.Println("Output and new state extracted from OPA")
+
 	updateState(baseURL, state, w)
+
+	log.Println("Sent new state to datastore")
 
 	// unlock datastore
 	unlock(baseURL, w)
@@ -71,6 +79,7 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(output)
+	log.Println("Output to the client")
 }
 
 /*
