@@ -145,7 +145,12 @@ func updateState(baseURL *url.URL, state map[string]any, w http.ResponseWriter) 
 func lock(baseURL *url.URL, w http.ResponseWriter) {
 	baseURL.Path = "lock"
 	client := http.Client{}
-	_, err := client.Get(baseURL.String())
+	req, err := http.NewRequest(http.MethodPost, baseURL.String(), nil)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	_, err = client.Do(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -153,9 +158,14 @@ func lock(baseURL *url.URL, w http.ResponseWriter) {
 }
 
 func unlock(baseURL *url.URL, w http.ResponseWriter) {
-	baseURL.Path = "unlock"
+	baseURL.Path = "lock"
 	client := http.Client{}
-	_, err := client.Get(baseURL.String())
+	req, err := http.NewRequest(http.MethodDelete, baseURL.String(), nil)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	_, err = client.Do(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

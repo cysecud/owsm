@@ -11,8 +11,6 @@ import (
 	"github.com/open-policy-agent/opa/storage/inmem"
 )
 
-// TODO: abstract from the policy engine used to evaluate policies (REST calls???)
-
 /*
  * It uses OPA's Go library to evaluate queries...
  * Extract the new state and the real output of the evaluated query
@@ -67,12 +65,12 @@ func Opa(data map[string]any, input any,
 	stateRaw, ok := result["state"]
 	if ok {
 		delete(result, "state")
+		state, good := stateRaw.(map[string]any)
+		if !good {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return state, result
 	}
 
-	state := stateRaw.(map[string]any)
-	if !ok {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-
-	return state, result
+	return nil, result
 }

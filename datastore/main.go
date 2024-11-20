@@ -33,8 +33,8 @@ func main() {
 
 	mux.HandleFunc("GET /data", handleData(datastore.store))
 	mux.HandleFunc("PUT /data/{key}", handleUpdate(datastore.store))
-	mux.HandleFunc("GET /lock", handleLock(&datastore))
-	mux.HandleFunc("GET /unlock", handleUnlock(&datastore))
+	mux.HandleFunc("POST /lock", handleLock(&datastore))
+	mux.HandleFunc("DELETE /lock", handleUnlock(&datastore))
 
 	log.Fatal(http.ListenAndServe(":8081", mux))
 }
