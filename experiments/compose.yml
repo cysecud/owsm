@@ -1,0 +1,30 @@
+services:
+    datastore:
+        build: ../datastore
+        entrypoint: /datastore
+        ports:
+            - "8081:8081"
+
+    wrapper:
+        build: ../opawrap
+        entrypoint:
+            - /opawrap
+            #- variable policy name
+        ports:
+            - "8080:8080"
+        volumes:
+            - # cartella:/policies/
+        environment:
+            - DATASTORE_URL=datastore
+        depends_on:
+            - datastore
+
+    opa:
+        image: openpoopenpolicyagent/opa
+        entrypoint:
+            - /opa
+            - run
+            - --server
+            # variable policy name
+        ports:
+            - "8181:8181"
