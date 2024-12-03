@@ -28,8 +28,5 @@ COPY --from=builder /app/owsm /app/owsm
 # Expose the necessary port (if applicable)
 EXPOSE 8080
 
-# Set non privileged user
-USER nonroot:nonroot
-
 # Command to run the application
 ENTRYPOINT [ "./owsm" ]

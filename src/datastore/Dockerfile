@@ -1,22 +1,27 @@
 # Build the application from source
 FROM golang:latest AS build
 
+# Set the working directory inside the container
 WORKDIR /app
 
-COPY go.* ./
-COPY *.go ./
-COPY *.json /*.json
+# Copy the source code
+COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /datastore
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o datastore .
 
-# Deploy the application binary into a lean image
-FROM gcr.io/distroless/base-debian11 AS relase
+# Stage 2: Runtime
+FROM scratch
 
-WORKDIR /
+# Set the working directory in the runtime container
+WORKDIR /app
 
-COPY --from=build /*.json /*.json
-COPY --from=build /datastore /datastore
+# Copy the built binary from the builder stage
+COPY --from=build /app/**/*.json .
+COPY --from=build /app/datastore .
 
+# Expose the necessary port (if applicable)
 EXPOSE 8081
 
-USER nonroot:nonroot
+# Command to run the application
+ENTRYPOINT [ "./datastore" ]
