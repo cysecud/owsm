@@ -30,4 +30,4 @@ go.work.sum
 .env
 
 # Json files in src
-/src/*.json
+/src/**/*.json
