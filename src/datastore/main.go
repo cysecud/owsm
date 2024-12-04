@@ -19,15 +19,25 @@ type ds struct {
 }
 
 func main() {
+	// Check if there's the data.json
+	if len(os.Args) < 2 {
+		log.Fatalln("[ERROR] Not provided argoment")
+	}
+
 	log.Println("[INFO] Starting datastore at port", PORT)
 
 	var datastore ds
 	datastore.store = make(map[string]any)
-	loadFromFile(&datastore.store)
-
-	if len(datastore.store) != 0 {
-		log.Println("[INFO] Load content from", filename, "filename")
+	//loadFromFile(&datastore.store)
+	data, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		log.Fatalln("[ERROR] Not correct file provided")
 	}
+	json.Unmarshal(data, &datastore.store)
+
+	/* if len(datastore.store) != 0 {
+		log.Println("[INFO] Load content from", filename, "filename")
+	} */
 
 	mux := http.NewServeMux()
 
@@ -36,7 +46,7 @@ func main() {
 	mux.HandleFunc("POST /lock", handleLock(&datastore))
 	mux.HandleFunc("DELETE /lock", handleUnlock(&datastore))
 
-	log.Fatal(http.ListenAndServe(":8081", mux))
+	log.Fatal(http.ListenAndServe(":"+PORT, mux))
 }
 
 func handleLock(datastore *ds) http.HandlerFunc {
