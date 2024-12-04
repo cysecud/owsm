@@ -58,10 +58,10 @@ func handleLock(datastore *ds) http.HandlerFunc {
 
 func handleUnlock(datastore *ds) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := saveToFile(datastore.store)
+		/* err := saveToFile(datastore.store)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-		}
+		} */
 		datastore.lock.Unlock()
 		log.Printf("Unlocked...")
 	}
