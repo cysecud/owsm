@@ -25,7 +25,6 @@ services:
             - /app/opa
             - run
             - --server
-            - --v1-compatible
             - /app/${POLICY_NAME}
             - /app/${DATA_NAME}
         ports:
