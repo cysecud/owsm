@@ -28,11 +28,11 @@ rm -rf ../src/wrapper/policies
 echo "Building \"opa\" docker image"
 
 cp -r ./artifacts/policies/ ./opa
-cp -r ./artifacts/inputs/ ./opa
+cp -r ./artifacts/datas/ ./opa
 docker build -t opa ./opa/
 docker save -o opa.tar opa
 mv opa.tar ./${EXPERIMENT}/images
-rm -rf ./opa/inputs
+rm -rf ./opa/datas
 rm -rf ./opa/policies
 
 # Apache Benchmark
