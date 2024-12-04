@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o owsm .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o wrapper .
 
 # Stage 2: Runtime
 FROM scratch
@@ -23,10 +23,10 @@ FROM scratch
 WORKDIR /app
 
 # Copy the built binary from the builder stage
-COPY --from=builder /app/owsm /app/owsm
+COPY --from=builder /app/wrapper /app/wrapper
 
 # Expose the necessary port (if applicable)
 EXPOSE 8080
 
 # Command to run the application
-ENTRYPOINT [ "./owsm" ]
+ENTRYPOINT [ "./wrapper" ]
