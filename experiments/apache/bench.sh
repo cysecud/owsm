@@ -24,7 +24,7 @@ for c in "${concurrency[@]}"; do
    opa_result=$(ab -numRequests $r -c $c -p /app/$INPUT_NAME -T application/json $opa_URL)
    opa_avg_time_ms=$(tprExtract "$opa_result")
 
-   echo "$r,$owsm_avg_time_ms,$opa_avg_time_ms" >> $outputFile
+   echo "$c,$owsm_avg_time_ms,$opa_avg_time_ms" >> $outputFile
 done
 
 echo "[INFO] Complete benchmark for $INPUT_NAME"

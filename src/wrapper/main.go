@@ -40,7 +40,7 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// lock datastore
-	lock(baseURL, w)
+	// lock(baseURL, w)
 
 	// retrieve input to send to the policy engine
 	body, err := io.ReadAll(r.Body)
@@ -69,7 +69,7 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 	log.Println("Sent new state to datastore")
 
 	// unlock datastore
-	unlock(baseURL, w)
+	// unlock(baseURL, w)
 
 	// Return only necessary output (i.e. without state part) to user
 	output, err := json.Marshal(result)
