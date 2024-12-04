@@ -23,6 +23,7 @@ FROM scratch
 WORKDIR /app
 
 # Copy the built binary from the builder stage
+COPY --from=builder /app/**/*.rego /app/
 COPY --from=builder /app/wrapper /app/wrapper
 
 # Expose the necessary port (if applicable)
