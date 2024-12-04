@@ -4,7 +4,7 @@
 # It generates images for datastore, oswm and opa with
 # all the files for testing purpose.
 
-EXPERIMENT="ex1"
+EXPERIMENT="ex2"
 
 ## Datastore
 echo "Building \"datastore\" docker image"

@@ -7,8 +7,8 @@ echo "requests,owsm_avg_time_ms,opa_avg_time_ms" > $outputFile
 owsm_URL="http://wrapper:8080/query"
 opa_URL="http://opa:8181/v1/data/examplerego"
 
-numRequests=(100 200 400 800 1600 3200 6400 12800 25600 51200)
-c=1
+numRequests=2000
+concurrency=(10 20 30 40 50 60 70 80 90 100)
 
 function tprExtract() {
    local result="$1"
@@ -17,11 +17,11 @@ function tprExtract() {
 
 echo "[INFO] Starting benchmark with $INPUT_NAME"
 
-for r in "${numRequests[@]}"; do
-   owsm_result=$(ab -n $r -c $c -p /app/$INPUT_NAME -T application/json $owsm_URL)
+for c in "${concurrency[@]}"; do
+   owsm_result=$(ab -numRequests $r -c $c -p /app/$INPUT_NAME -T application/json $owsm_URL)
    owsm_avg_time_ms=$(tprExtract "$owsm_result")
 
-   opa_result=$(ab -n $r -c $c -p /app/$INPUT_NAME -T application/json $opa_URL)
+   opa_result=$(ab -numRequests $r -c $c -p /app/$INPUT_NAME -T application/json $opa_URL)
    opa_avg_time_ms=$(tprExtract "$opa_result")
 
    echo "$r,$owsm_avg_time_ms,$opa_avg_time_ms" >> $outputFile
