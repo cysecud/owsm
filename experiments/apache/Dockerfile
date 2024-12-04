@@ -9,6 +9,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy the script files
-COPY . .
+COPY **/*.json .
+COPY bench.sh .
 
 #ENTRYPOINT [ "ab", "-h" ]
