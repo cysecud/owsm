@@ -18,10 +18,10 @@ function tprExtract() {
 echo "[INFO] Starting benchmark with $INPUT_NAME"
 
 for c in "${concurrency[@]}"; do
-   owsm_result=$(ab -numRequests $r -c $c -p /app/$INPUT_NAME -T application/json $owsm_URL)
+   owsm_result=$(ab -n $numRequests -c $c -p /app/$INPUT_NAME -T application/json $owsm_URL)
    owsm_avg_time_ms=$(tprExtract "$owsm_result")
 
-   opa_result=$(ab -numRequests $r -c $c -p /app/$INPUT_NAME -T application/json $opa_URL)
+   opa_result=$(ab -n $numRequests -c $c -p /app/$INPUT_NAME -T application/json $opa_URL)
    opa_avg_time_ms=$(tprExtract "$opa_result")
 
    echo "$c,$owsm_avg_time_ms,$opa_avg_time_ms" >> $outputFile
