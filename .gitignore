@@ -31,3 +31,6 @@ go.work.sum
 
 # Json files in src
 /src/**/*.json
+
+# Tar build of Docker
+*.tar
