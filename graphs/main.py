@@ -6,6 +6,7 @@ from scipy.stats import mannwhitneyu
 # Step 1: Load the CSV data
 dir_path_1 = './ex1/results/'  # Replace with your file's path
 
+print("|- Considering experiment 1")
 for file in os.listdir(dir_path_1):
     data = pd.read_csv(os.path.join(dir_path_1, file))
 
@@ -15,15 +16,33 @@ for file in os.listdir(dir_path_1):
 
     # Step 3: Generate a box plot
     plt.figure(figsize=(8, 6))
-    data[['owsm_avg_time_ms', 'opa_avg_time_ms']].boxplot()
+    data[['OWSM', 'OPA']].boxplot()
     plt.title('Box Plot')
-    plt.yscale("log")
-    plt.savefig(os.path.join(output_dir, file + '.png'))
+    #plt.yscale("log")
+    plt.savefig(os.path.join(output_dir, os.path.splitext(os.path.basename(file))[0] + '-boxplot.png'))
     plt.close()
 
-    print(f"Plots saved")
+    plt.figure(figsize=(8, 6))
+    plt.plot(data['number_request'], data['OWSM'], "o", color="red")  # Replace with relevant column names
+    plt.plot(data['number_request'], data['OPA'], "x", color="blue")
+    plt.title('Comparison ' + file)
+    ax=plt.gca()
+    ax.legend(["OWSM", "OPA"])
+    plt.xlabel('Number of request')  # Replace with relevant column name
+    plt.ylabel('Elapsed time (ms)')  # Replace with relevant column name
+    plt.savefig(os.path.join(output_dir, os.path.splitext(os.path.basename(file))[0] + '-plot.png'))
+    plt.close()
 
-dir_path_2 = './ex2/results/' 
+    print("|-- Plot saved")
+
+    # Perform the Mann-Whitney U test
+    result = mannwhitneyu(data['OWSM'], data['OPA'])
+
+    # Display the results
+    print("|-- U statistic:", result.statistic)
+    print("|-- P-value:", result.pvalue)
+
+""" dir_path_2 = './ex2/results/' 
 
 for file in os.listdir(dir_path_2):
     data = pd.read_csv(os.path.join(dir_path_2, file))
@@ -73,5 +92,5 @@ for file in os.listdir(dir_path_3):
     plt.ylabel('Elapsed time (ms)')  # Replace with relevant column name
     plt.savefig(os.path.join(output_dir, file + '.png'))
     plt.close()
-
+ """
     
