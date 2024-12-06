@@ -4,7 +4,7 @@
 # It generates images for datastore, oswm and opa with
 # all the files for testing purpose.
 
-EXPERIMENT="ex3"
+EXPERIMENT="ex1"
 
 ## Datastore
 echo "Building \"datastore\" docker image"
@@ -35,11 +35,11 @@ mv opa.tar ./${EXPERIMENT}/images
 rm -rf ./opa/datas
 rm -rf ./opa/policies
 
-# Apache Benchmark
-echo "Building \"apache\" docker image"
+# Tester
+echo "Building \"tester\" docker image"
 
-cp -r ./artifacts/inputs/ ./apache
-docker build -t apache ./apache/
-docker save -o apache.tar apache
-mv apache.tar ./${EXPERIMENT}/images
-rm -rf ./apache/inputs
+cp -r ./artifacts/inputs/ ./tester
+docker build -t tester ./tester/
+docker save -o tester.tar tester
+mv tester.tar ./${EXPERIMENT}/images
+rm -rf ./tester/inputs
