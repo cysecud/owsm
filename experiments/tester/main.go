@@ -10,6 +10,24 @@ import (
 	"time"
 )
 
+// checkURL checks if a URL is available by sending a HEAD request
+func checkURL(url string, timeout time.Duration) bool {
+	client := &http.Client{
+		Timeout: timeout,
+	}
+
+	// Send a HEAD request
+	resp, err := client.Head(url)
+	if err != nil {
+		fmt.Printf("Error checking URL %s: %v\n", url, err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	fmt.Printf("URL %s is available.\n", url)
+	return true
+}
+
 func main() {
 	// Define the two URLs and the number of requests
 	owsm_url := "http://wrapper:8080/query"
@@ -46,6 +64,18 @@ func main() {
 
 	// Write the header row to the CSV
 	writer.Write([]string{"number_request", "OWSM", "OPA"})
+
+	// Timeout for each check
+	timeout := 5 * time.Second
+
+	// Check availability of all URLs
+	allAvailable := false
+
+	for !allAvailable {
+		if checkURL(owsm_url, timeout) && checkURL(opa_url, timeout) {
+			allAvailable = true
+		}
+	}
 
 	// Perform the requests and record the times
 	for i := 1; i <= numRequests; i++ {
