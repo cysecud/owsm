@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM scratch
 WORKDIR /app
 COPY --from=openpolicyagent/opa /opa .
 COPY **/*.rego .
