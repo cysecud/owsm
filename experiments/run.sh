@@ -2,54 +2,104 @@
 
 set -ex
 
-# define cleanup function
+############################
+# Cleanup handling
+############################
+pids=()
+
 cleanup() {
   for pid in "${pids[@]}"; do
-    kill -0 "$pid" && kill "$pid" # kill process only if it's still running
+    kill -0 "$pid" 2>/dev/null && kill "$pid"
   done
 }
-
-# and set that function to run before we exit, or specifically when we get a SIGTERM
 trap cleanup EXIT TERM
 
-pids=( )
+############################
+# Common configuration
+############################
 INDEXES=("1" "2" "3")
-EXPERIMENTS=("ex1") # "ex2" "ex3")
+WRAPPER="wrapper-lock"
 
-for exp in "${EXPERIMENTS[@]}"; do
-    echo "[INFO] [EXP:$exp] Running experiment $exp..."
+BASE_RESULTS="./results"
 
-    for index in "${INDEXES[@]}"; do
-    	echo "[INFO] [EXP:$exp] [UC:$index] Starting use case n.$index"
+############################
+# Experiment configurations
+############################
 
-        ./datastore ./datas/data$index.json & pids+=( "$!" )
+# Experiment 1: vary number of requests
+EXP1_NAME="exp-1"
+EXP1_REQUESTS=("100" "200" "400" "800" "1600" "3200" "6400" "12800" "25600" "51200" "102400")
 
-        ./opa run --server ./policies/policy$index.rego ./datas/data$index.json & pids+=( "$!" )
+# Experiment 2: vary concurrency
+EXP2_NAME="exp-2"
+EXP2_CONCURRENCIES=("100" "200" "400" "800" "1600" "3200" "6400")
+EXP2_REQUESTS=51200
 
-        ./wrapper ./policies/policy$index.rego & pids+=( "$!" )
+############################
+# Helper functions
+############################
 
-        #USE_CASE=$index ./tester ./inputs/input$index.json & pids+=( "$!" )
+start_services() {
+  local index="$1"
 
+  ./datastore "./datas/data${index}.json" & pids+=( "$!" )
+  ./opa run --server "./policies/policy${index}.rego" "./datas/data${index}.json" & pids+=( "$!" )
+  ./"$WRAPPER" "./policies/policy${index}.rego" & pids+=( "$!" )
+}
 
-	./ab -n 10000 -c 1 -T application/json -p ./inputs/input$index.json -g ./results/$exp/owsm/$index-c1.tsv http://localhost:8080/query
-	./ab -n 10000 -c 10 -T application/json -p ./inputs/input$index.json -g ./results/$exp/owsm/$index-c10.tsv http://localhost:8080/query
-	./ab -n 10000 -c 100 -T application/json -p ./inputs/input$index.json -g ./results/$exp/owsm/$index-c100.tsv http://localhost:8080/query
-	./ab -n 10000 -c 1000 -T application/json -p ./inputs/input$index.json -g ./results/$exp/owsm/$index-c1000.tsv http://localhost:8080/query
+run_ab() {
+  local requests="$1"
+  local concurrency="$2"
+  local index="$3"
+  local exp="$4"
 
-	./ab -n 10000 -c 1 -T application/json -p ./inputs/input$index.json -g ./results/$exp/opa/$index-c1.tsv http://localhost:8181/v1/data/examplerego
-	./ab -n 10000 -c 10 -T application/json -p ./inputs/input$index.json -g ./results/$exp/opa/$index-c10.tsv http://localhost:8181/v1/data/examplerego
-	./ab -n 10000 -c 100 -T application/json -p ./inputs/input$index.json -g ./results/$exp/opa/$index-c100.tsv http://localhost:8181/v1/data/examplerego
-	./ab -n 10000 -c 1000 -T application/json -p ./inputs/input$index.json -g ./results/$exp/opa/$index-c1000.tsv http://localhost:8181/v1/data/examplerego
+  ./ab -n "$requests" -c "$concurrency" \
+    -T application/json \
+    -p "./inputs/input${index}.json" \
+    -g "${BASE_RESULTS}/${exp}/owsm/${index}-${requests:-$concurrency}.tsv" \
+    http://localhost:8080/query
 
-        # Loop until the file exists
-        # while [ ! -f "./results/.done" ]; do
-            # sleep 1
-        #done
+  ./ab -n "$requests" -c "$concurrency" \
+    -T application/json \
+    -p "./inputs/input${index}.json" \
+    -g "${BASE_RESULTS}/${exp}/opa/${index}-${requests:-$concurrency}.tsv" \
+    http://localhost:8181/v1/data/examplerego
+}
 
-		#rm "./results/.done"
-        echo "[INFO] [EXP:$exp] [UC:$index] Use case n.$index complete!"
-    done
+############################
+# Experiment 1
+############################
+echo "[INFO] Running experiment ${EXP1_NAME}"
+mkdir -p "${BASE_RESULTS}/${EXP1_NAME}/owsm" "${BASE_RESULTS}/${EXP1_NAME}/opa"
 
-    #rm .env
-    echo "[INFO] [EXP:$exp] Experiment $exp complete!"
+for index in "${INDEXES[@]}"; do
+  echo "[INFO] [EXP:${EXP1_NAME}] [UC:${index}] Starting use case"
+
+  start_services "$index"
+
+  for req in "${EXP1_REQUESTS[@]}"; do
+    run_ab "$req" 1 "$index" "$EXP1_NAME"
+  done
+
+  echo "[INFO] [EXP:${EXP1_NAME}] [UC:${index}] Complete"
 done
+
+############################
+# Experiment 2
+############################
+echo "[INFO] Running experiment ${EXP2_NAME}"
+mkdir -p "${BASE_RESULTS}/${EXP2_NAME}/owsm" "${BASE_RESULTS}/${EXP2_NAME}/opa"
+
+for index in "${INDEXES[@]}"; do
+  echo "[INFO] [EXP:${EXP2_NAME}] [UC:${index}] Starting use case"
+
+  start_services "$index"
+
+  for conc in "${EXP2_CONCURRENCIES[@]}"; do
+    run_ab "$EXP2_REQUESTS" "$conc" "$index" "$EXP2_NAME"
+  done
+
+  echo "[INFO] [EXP:${EXP2_NAME}] [UC:${index}] Complete"
+done
+
+echo "[INFO] All experiments completed!"
