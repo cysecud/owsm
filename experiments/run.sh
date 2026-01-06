@@ -42,9 +42,9 @@ EXP2_REQUESTS=51200
 start_services() {
   local index="$1"
 
-  ./datastore ".artifacts/datas/data${index}.json" & pids+=( "$!" )
-  ./opa run --server ".artifacts/policies/policy${index}.rego" ".artifacts/datas/data${index}.json" & pids+=( "$!" )
-  ./"$WRAPPER" ".artifacts/policies/policy${index}.rego" & pids+=( "$!" )
+  ./datastore "./artifacts/datas/data${index}.json" & pids+=( "$!" )
+  ./opa run --server "./artifacts/policies/policy${index}.rego" "./artifacts/datas/data${index}.json" & pids+=( "$!" )
+  ./"$WRAPPER" "./artifacts/policies/policy${index}.rego" & pids+=( "$!" )
 }
 
 run_ab() {
@@ -55,13 +55,13 @@ run_ab() {
 
   ./ab -n "$requests" -c "$concurrency" \
     -T application/json \
-    -p ".artifacts/inputs/input${index}.json" \
+    -p "./artifacts/inputs/input${index}.json" \
     -g "${BASE_RESULTS}/${exp}/owsm/${index}-${requests:-$concurrency}.tsv" \
     http://localhost:8080/query
 
   ./ab -n "$requests" -c "$concurrency" \
     -T application/json \
-    -p ".artifacts/inputs/input${index}.json" \
+    -p "./artifacts/inputs/input${index}.json" \
     -g "${BASE_RESULTS}/${exp}/opa/${index}-${requests:-$concurrency}.tsv" \
     http://localhost:8181/v1/data/examplerego
 }
