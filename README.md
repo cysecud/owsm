@@ -1,4 +1,4 @@
-# OWSM: OPA WRAPPER STATE MANAGER
+# OWSM: OPA Wrapper State Manager
 This is a simple Go wrapper around OPA! 
 It allows saving the state of evaluated rules written in Rego.
 
